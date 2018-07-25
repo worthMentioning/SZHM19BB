@@ -1,4 +1,4 @@
-# 02.first
+# 商品管理
 
 ## Project setup
 ```
