@@ -38,9 +38,12 @@
                 <div id="menu2" class="nav-box menuhd">
                     <ul>
                         <li class="index">
-                                <router-link to="/index">
-                                    <span class="out" style="top: 0px;">首页</span>
-                                </router-link>
+                            <!-- <a href="#" class="">
+                                
+                            </a> -->
+                            <router-link to="/index">
+                                <span class="out" style="top: 0px;">首页</span>
+                            </router-link>
                         </li>
                         <li class="news">
                             <a href="#" class="">
@@ -79,8 +82,15 @@
                 </div>
             </div>
         </div>
+    
+    
+    
+    
+    
+    
+    
     </div>
-    <!-- 路由的出口 -->
+    <!-- 路由出口 -->
     <router-view></router-view>
     <!-- 底部通栏 -->
     <div class="footer">
@@ -114,14 +124,11 @@
                     </div>
                 </div>
             </div>
-  </div>
+  </div>  
 </template>
-
 <script>
-export default {}; 
+    export default {};
 </script>
-
-<style>
-  /* 标准的 css中导入其他css的语法 */
-  /* @import url('./assets/statics/site/css/style.css'); */
+<style >
+     /* @import url('./assets/statics/site/css/style.css'); */
 </style>

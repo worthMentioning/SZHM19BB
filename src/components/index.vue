@@ -1,5 +1,6 @@
 <template>
-    <div class="index">
+
+   <div class="index">
         <div class="section">
             <div class="location">
                 <span>当前位置：</span>
@@ -585,13 +586,3 @@
         </div>
     </div>
 </template>
-<script>
-export default {
-    
-}
-</script>
-<style scoped>
-
-</style>
-
-
