@@ -9,7 +9,7 @@ import goodsInfo from './components/goodsInfo.vue';
 import axios from "axios";
 import ElementUI from 'element-ui';
 // 导入css
-// import "element-ui/lib/theme-chalk/index.css";
+import "element-ui/lib/theme-chalk/index.css";
 
 // 导入iview 框架
 // 导入iViewUI框架
