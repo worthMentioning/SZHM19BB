@@ -10,7 +10,7 @@ import axios from "axios";
 import ElementUI from 'element-ui';
 // 导入css
 import "element-ui/lib/theme-chalk/index.css";
-
+import moment from "moment";
 // 导入iview 框架
 // 导入iViewUI框架
 // import iView from "iview";
@@ -39,7 +39,7 @@ const router = new VueRouter({
       component:index
     },
     {
-      path:'/goodsInfo',
+      path:'/goodsInfo/:id',
       component:goodsInfo
     },
   ]
@@ -48,6 +48,12 @@ const router = new VueRouter({
 // 引入css
 import './assets/statics/site/css/style.css';
 
+//注册全局过滤器
+Vue.filter (
+  "cutTime",function(value){
+    return moment(value).format("YYYY年MM月DD日")
+  }
+  )
 Vue.config.productionTip = false
 
 new Vue({
