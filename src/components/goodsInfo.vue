@@ -86,18 +86,19 @@
                         <div id="goodsTabs" class="goods-tab bg-wrap">
                             <div id="tabHead" class="tab-head" style="position: static; top: 517px; width: 925px;">
                                 <ul>
-                                    <li>
-                                        <a href="javascript:;" class="selected">商品介绍</a>
+                                    <li >
+                                        <a @click="isShowDec = true;" href="javascript:;" :class="{selected:isShowDec}">商品介绍</a>
                                     </li>
-                                    <li>
-                                        <a href="javascript:;">商品评论</a>
+                                    <li >
+                                        <a @click="isShowDec = false;" href="javascript:;"  :class="{selected:!isShowDec}">商品评论</a>
                                     </li>
                                 </ul>
                             </div>
-                            <div class="tab-content entry" style="display: block;">
+                            <!-- <div class="tab-content entry" style="display: block;">
                                 内容
-                            </div>
-                            <div class="tab-content" style="display: block;">
+                            </div> -->
+                            <div v-html="goodsinfo.content" v-show="isShowDec"></div>
+                            <div class="tab-content"  v-show="!isShowDec" style="display: block;">
                                 <div class="comment-box">
                                     <div id="commentForm" name="commentForm" class="form-box">
                                         <div class="avatar-box">
@@ -115,7 +116,7 @@
                                         </div>
                                     </div>
                                     <ul id="commentList" class="list-box">
-                                        <p style="margin: 5px 0px 15px 69px; line-height: 42px; text-align: center; border: 1px solid rgb(247, 247, 247);">暂无评论，快来抢沙发吧！</p>
+                                        <p v-if="" style="margin: 5px 0px 15px 69px; line-height: 42px; text-align: center; border: 1px solid rgb(247, 247, 247);">暂无评论，快来抢沙发吧！</p>
                                         <li>
                                             <div class="avatar-box">
                                                 <i class="iconfont icon-user-full"></i>
@@ -188,29 +189,15 @@ export default {
             goodsinfo:{},
             hotgoodslist:[],
             imglist: [],
-            
+            isShowDec : true,
+            pageIndex:5,
+            pageSize:1,
             // 轮播图的数据
             images: {
                 normal_size: []
             },
             // 轮播图的配置
-            zoomerOptions: {
-                // zoomFactor: 2,
-                // pane: "container-round",
-                // hoverDelay: 300,
-                // namespace: "inline-zoomer",
-                // move_by_click: true,
-                // scroll_items: 5,
-                // choosed_thumb_border_color: "#bbdefb"
-                //  zoomFactor: 2,
-                // pane: "container-round",
-                // hoverDelay: 300,
-                // namespace: "zoomer-bottom",
-                // move_by_click: true,
-                // scroll_items: 5,
-                // choosed_thumb_border_color: "#dd2c00",
-                // scroller_position: "bottom",
-                
+            zoomerOptions: {              
                 zoomFactor: 2,
                 pane: "container-round",
                 hoverDelay: 300,
@@ -232,30 +219,37 @@ export default {
             this.axios
             .get(`/site/goods/getgoodsInfo/${this.$route.params.id}`)
             .then(response=>{
-                console.log(response);
+                // console.log(response);
                 this.goodsinfo = response.data.message.goodsinfo;
                 this.hotgoodslist = response.data.message.hotgoodslist;
                 this.imglist = response.data.message.imglist;
-                console.log(this.imglist);
-                
                 //再赋值到images 中
                 this.imglist.forEach((v,i)=>{
                     this.images.normal_size.push({
                         id: v.id,
                         url: v.original_path
-                    })
-                    
-                });
-                
+                    })                   
+                });               
             }).catch(error=>{ });
         },
+        getcomments(){
+            this.axios
+            .get(`site/comment/getbypage/goods/${this.$route.params.id}?pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`)
+            .then(response=>{
+                console.log(response);
+            })
+            .catch(error=>{
+                console.log(error);
+                
+            })
+        }
     },
 
     created() {
     // 获取商品详情
     this.getgoodsInfo();
     // 获取评论信息
-    // this.getcomments();
+    this.getcomments();
     // 打印vuex的值
     console.log('goodsinfo组件')
     // console.log(this.$store);
@@ -264,10 +258,6 @@ export default {
 </script>
 
 <style lang="scss">
-/* 指定使用的是sass */
-/* 导入字体图标的样式 */
-// @import url("../../node_modules/font-awesome/css/font-awesome.min.css");
-/* .container-zoomer-zoomer-box { */
 
 .pic-box img {
     width: 317px;
