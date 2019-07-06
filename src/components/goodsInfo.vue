@@ -13,7 +13,17 @@
                 <div class="wrap-box">
                     <div class="left-925">
                         <div class="goods-box clearfix">
-                            <div class="pic-box"></div>
+                            <div class="pic-box">
+                                <!-- 在数据回来之后才创建 v-show是不可以的(元素一直都在)
+                                    这个别人写好的这个组件 没有帮我们实现 数据更新 自动生成的功能
+                                 -->
+                                 <ProductZoomer
+                                 v-if="imglist.length!=0"
+                                :base-images="images"
+                                :base-zoomer-options="zoomerOptions"
+                                />
+                                <!-- <ProductZoomer v-if="imglist.length!=0" :baseImages="images" :base-zoomer-options="zoomerOptions"></ProductZoomer> -->
+                            </div>
                             <div class="goods-spec">
                                 <h1>{{goodsinfo.title}}</h1>
                                 <p class="subtitle">{{goodsinfo.sub_title}}</p>
@@ -149,12 +159,12 @@
                                 <ul class="side-img-list">
                                     <li v-for="(item, index) in hotgoodslist" :key="item.id">
                                         <div class="img-box">
-                                            <a href="#/site/goodsinfo/90" class="">
+                                            <router-link :to="`/goodsinfo/`+item.id">                                        
                                                 <img :src="item.img_url">
-                                            </a>
+                                            </router-link>
                                         </div>
                                         <div class="txt-box">
-                                            <a href="#/site/goodsinfo/90" class="">{{item.title}}</a>
+                                            <router-link :to="`/goodsinfo/`+item.id"> {{item.title}} </router-link>
                                             <span>{{item.add_time | cutTime }}</span>
                                         </div>
                                     </li>
@@ -169,39 +179,124 @@
     </div>
 </template>
 <script>
-// 接口调用
-// http://47.106.148.205:8899/site/goods/gettopdata/goods
+import ProductZoomer from 'vue-product-zoomer'
+import $ from 'jquery';
+
 export default {
     data:function(){
         return {
             goodsinfo:{},
-            hotgoodslist:[]
-        }
-    },
-    
-    created(){
-        
-        this.axios
-        .get(`/site/goods/getgoodsInfo/${this.$route.params.id}`)
-        .then(response=>{
-            console.log(response);
-            this.goodsinfo = response.data.message.goodsinfo;
-            this.hotgoodslist = response.data.message.hotgoodslist;
+            hotgoodslist:[],
+            imglist: [],
             
-        }).catch(error=>{ });
-        
+            // 轮播图的数据
+            images: {
+                normal_size: []
+            },
+            // 轮播图的配置
+            zoomerOptions: {
+                // zoomFactor: 2,
+                // pane: "container-round",
+                // hoverDelay: 300,
+                // namespace: "inline-zoomer",
+                // move_by_click: true,
+                // scroll_items: 5,
+                // choosed_thumb_border_color: "#bbdefb"
+                //  zoomFactor: 2,
+                // pane: "container-round",
+                // hoverDelay: 300,
+                // namespace: "zoomer-bottom",
+                // move_by_click: true,
+                // scroll_items: 5,
+                // choosed_thumb_border_color: "#dd2c00",
+                // scroller_position: "bottom",
+                
+                zoomFactor: 2,
+                pane: "container-round",
+                hoverDelay: 300,
+                namespace: "zoomer-bottom",
+                move_by_click: false,
+                scroll_items: 4,
+                choosed_thumb_border_color: "#dd2c00",
+                scroller_position: "bottom",
+                zoomer_pane_position: "right"
+            },
+        };
     },
-//     created() {
-//     // 获取商品详情
-//     this.getgoodsInfo();
-//     // 获取评论信息
-//     this.getcomments();
-//     // 打印vuex的值
-//     console.log('goodsinfo组件')
-//     console.log(this.$store);
-//   },
+    methods:{
+        getgoodsInfo(){
+             // 强制初始化
+            this.imglist = [];
+            // 清空预览图片的数组
+            this.images.normal_size = [];
+            this.axios
+            .get(`/site/goods/getgoodsInfo/${this.$route.params.id}`)
+            .then(response=>{
+                console.log(response);
+                this.goodsinfo = response.data.message.goodsinfo;
+                this.hotgoodslist = response.data.message.hotgoodslist;
+                this.imglist = response.data.message.imglist;
+                console.log(this.imglist);
+                
+                //再赋值到images 中
+                this.imglist.forEach((v,i)=>{
+                    this.images.normal_size.push({
+                        id: v.id,
+                        url: v.original_path
+                    })
+                    
+                });
+                
+            }).catch(error=>{ });
+        },
+    },
+
+    created() {
+    // 获取商品详情
+    this.getgoodsInfo();
+    // 获取评论信息
+    // this.getcomments();
+    // 打印vuex的值
+    console.log('goodsinfo组件')
+    // console.log(this.$store);
+  },
 }
 </script>
 
+<style lang="scss">
+/* 指定使用的是sass */
+/* 导入字体图标的样式 */
+// @import url("../../node_modules/font-awesome/css/font-awesome.min.css");
+/* .container-zoomer-zoomer-box { */
 
+.pic-box img {
+    width: 317px;
+    height: 250px;
+}
+
+.pic-box .control-box .thumb-list {
+  display: flex;
+}
+.thumb-list {
+  img {
+    height: 78px !important;
+    width: 78px !important;
+    margin: 5px;
+  }
+}
+.control i {
+  text-align: center;
+}
+.moveImg{
+    width: 40px;
+    position: absolute;
+    top: 0;
+    right: 50px;
+}
+.moveImg.move{
+    transform: scale(.5,.5) rotateZ(3600deg);
+    opacity: .4;
+    transition: transform 1s,opacity  1s;
+}
+</style>
 

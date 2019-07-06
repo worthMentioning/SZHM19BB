@@ -5,12 +5,15 @@ import VueRouter from 'vue-router';
 // 引入index组件
 import index from './components/index.vue';
 import goodsInfo from './components/goodsInfo.vue';
+
+import VueLazyload from 'vue-lazyload'
 // 导入 axios模块 目的是让所有组件都可以使用
 import axios from "axios";
 import ElementUI from 'element-ui';
 // 导入css
 import "element-ui/lib/theme-chalk/index.css";
 import moment from "moment";
+import ProductZoomer from 'vue-product-zoomer'
 // 导入iview 框架
 // 导入iViewUI框架
 // import iView from "iview";
@@ -26,6 +29,13 @@ Vue.prototype.axios = axios;
 // 使用路由中间件
 Vue.use(VueRouter);
 Vue.use(ElementUI);
+Vue.use(VueLazyload);
+Vue.use(ProductZoomer);
+// 使用懒加载中间件
+Vue.use(VueLazyload, {
+  // 图片当做资源来引入
+  loading: require("./assets/statics/img/loading2.gif")
+});
 // Vue.use(iView);
 // 注册路由规则
 const router = new VueRouter({
