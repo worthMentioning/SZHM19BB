@@ -15,8 +15,8 @@ import "element-ui/lib/theme-chalk/index.css";
 import moment from "moment";
 import ProductZoomer from 'vue-product-zoomer'
 
-// import iView from "iview";
-// import "iview/dist/styles/iview.css";
+import iView from "iview";
+import "iview/dist/styles/iview.css";
 // 正常的服务器
 axios.defaults.baseURL = "http://47.106.148.205:8899";
 // 设置带上cookie
@@ -27,6 +27,7 @@ Vue.prototype.axios = axios;
 // 使用路由中间件
 Vue.use(VueRouter);
 Vue.use(ElementUI);
+Vue.use(iView);
 Vue.use(VueLazyload);
 Vue.use(ProductZoomer);
 // 使用懒加载中间件

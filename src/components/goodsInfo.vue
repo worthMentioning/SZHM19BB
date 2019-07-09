@@ -106,48 +106,54 @@
                                         </div>
                                         <div class="conn-box">
                                             <div class="editor">
-                                                <textarea id="txtContent" name="txtContent" sucmsg=" " datatype="*10-1000" nullmsg="请填写评论内容！"></textarea>
+                                                <textarea
+                                                 v-model.trim ="commentContent"
+                                                 id="txtContent" 
+                                                 name="txtContent" 
+                                                 sucmsg=" " 
+                                                 datatype="*10-1000" 
+                                                 nullmsg="请填写评论内容！"></textarea>
                                                 <span class="Validform_checktip"></span>
                                             </div>
                                             <div class="subcon">
-                                                <input id="btnSubmit" name="submit" type="submit" value="提交评论" class="submit">
+                                                <input 
+                                                :plain="true"
+                                                @click="submitComment"
+                                                id="btnSubmit" 
+                                                name="submit" 
+                                                type="submit" 
+                                                value="提交评论" 
+                                                class="submit">
                                                 <span class="Validform_checktip"></span>
                                             </div>
                                         </div>
                                     </div>
                                     <ul id="commentList" class="list-box">
-                                        <p v-if="" style="margin: 5px 0px 15px 69px; line-height: 42px; text-align: center; border: 1px solid rgb(247, 247, 247);">暂无评论，快来抢沙发吧！</p>
-                                        <li>
+                                        <p v-if="messageList.length==0"  style="margin: 5px 0px 15px 69px; line-height: 42px; text-align: center; border: 1px solid rgb(247, 247, 247);">暂无评论，快来抢沙发吧！</p>
+                                        <li v-for="(item, index) in messageList" :key="item.id">
                                             <div class="avatar-box">
                                                 <i class="iconfont icon-user-full"></i>
                                             </div>
                                             <div class="inner-box">
                                                 <div class="info">
-                                                    <span>匿名用户</span>
-                                                    <span>2017/10/23 14:58:59</span>
+                                                    <span>{{item.user_name}}</span>
+                                                    <span>{{item.add_time | cutTime}}</span>
                                                 </div>
-                                                <p>testtesttest</p>
+                                                <p>{{item.content}}</p>
                                             </div>
                                         </li>
-                                        <li>
-                                            <div class="avatar-box">
-                                                <i class="iconfont icon-user-full"></i>
-                                            </div>
-                                            <div class="inner-box">
-                                                <div class="info">
-                                                    <span>匿名用户</span>
-                                                    <span>2017/10/23 14:59:36</span>
-                                                </div>
-                                                <p>很清晰调动单很清晰调动单</p>
-                                            </div>
-                                        </li>
+    
                                     </ul>
                                     <div class="page-box" style="margin: 5px 0px 0px 62px;">
-                                        <div id="pagination" class="digg">
-                                            <span class="disabled">« 上一页</span>
-                                            <span class="current">1</span>
-                                            <span class="disabled">下一页 »</span>
-                                        </div>
+                                         <Page 
+                                         placement="top"
+                                         :page-size	="pageSize"
+                                         :total="totalcount" 
+                                         show-sizer 
+                                         show-elevator
+                                         @on-change="pageChange($event)" 
+                                         @on-page-size-change="pageSizeChange($event)"
+                                         :page-size-opts="[5,10,15,20]" />
                                     </div>
                                 </div>
                             </div>
@@ -190,24 +196,34 @@ export default {
             hotgoodslist:[],
             imglist: [],
             isShowDec : true,
-            pageIndex:5,
-            pageSize:1,
+            pageIndex:1,
+            pageSize:5,
+            totalcount:0,
             // 轮播图的数据
             images: {
                 normal_size: []
             },
             // 轮播图的配置
             zoomerOptions: {              
-                zoomFactor: 2,
-                pane: "container-round",
-                hoverDelay: 300,
-                namespace: "zoomer-bottom",
-                move_by_click: false,
-                scroll_items: 4,
-                choosed_thumb_border_color: "#dd2c00",
-                scroller_position: "bottom",
-                zoomer_pane_position: "right"
+                // zoomFactor: 2,
+                // pane: "container-round",
+                // hoverDelay: 300,
+                // namespace: "zoomer-bottom",
+                // move_by_click: false,
+                // scroll_items: 4,
+                // choosed_thumb_border_color: "#dd2c00",
+                "scroller_position": "bottom",
+                // zoomer_pane_position: "right"
+                 "zoomFactor": 4,
+                "pane": "container-round",
+                "hoverDelay": 300,
+                "namespace": "zoomer-bottom",
+                "move_by_click":true,
+                "scroll_items": 5,
+                "choosed_thumb_border_color": "#bbdefb"
             },
+            messageList:[],
+            commentContent:"",
         };
     },
     methods:{
@@ -232,16 +248,53 @@ export default {
                 });               
             }).catch(error=>{ });
         },
+        //获取评论信息
         getcomments(){
             this.axios
-            .get(`site/comment/getbypage/goods/${this.$route.params.id}?pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`)
+            .get(`site/comment/getbypage/goods/${this.$route.params.id}?pageIndex=${
+                this.pageIndex
+                }&pageSize=${this.pageSize}`)
             .then(response=>{
                 console.log(response);
+                this.messageList = response.data.message;
+                this.totalcount = response.data.totalcount;
             })
             .catch(error=>{
                 console.log(error);
-                
             })
+        },
+        submitComment(){
+            if(this.commentContent==""){
+                this.$message({
+                    message:"评论内容不能为空，请输入内容！！",
+                    center: true
+                });
+                return;
+            }else{
+                this.axios.post(`site/validate/comment/post/goods/${this.$route.params.id}`,{
+                    commenttxt:this.commentContent
+                })
+                .then(response=>{
+                    console.log(response);
+                    
+                }).catch(err=>{
+                    console.log(err);
+                    
+                });
+            }
+        },
+        pageChange(v){
+            console.log(v);
+            //页面改变
+            this.pageIndex = v;
+            // 重新获取评论信息
+            this.getcomments();
+
+        },
+        pageSizeChange(sizechange){
+            this.pageSize = sizechange;
+            this.getcomments();
+
         }
     },
 
@@ -258,10 +311,11 @@ export default {
 </script>
 
 <style lang="scss">
-
+.goods-box{
+    height: 480px;
+}
 .pic-box img {
-    width: 317px;
-    height: 250px;
+    width: 360px;
 }
 
 .pic-box .control-box .thumb-list {
